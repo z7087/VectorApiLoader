@@ -39,5 +39,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: VectorApiLoader
+          name: IncubatorApiLoader
           path: build/libs/*.jar
