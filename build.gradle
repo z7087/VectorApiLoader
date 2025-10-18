@@ -6,7 +6,6 @@ group = 'me.z7087'
 version = '1.0-SNAPSHOT'
 
 repositories {
-    mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
