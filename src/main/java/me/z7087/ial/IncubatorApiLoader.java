@@ -8,6 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -28,23 +29,18 @@ public final class IncubatorApiLoader {
 
     @SuppressWarnings("Since15")
     public static IncubatorApiLoader of(String moduleName, String classNameInModule) {
+        Objects.requireNonNull(moduleName);
+        Objects.requireNonNull(classNameInModule);
         if (!IS_MODULE_SUPPORTED)
             return NOT_SUPPORTED_LOADER;
         if (ModuleFinder.ofSystem().find(moduleName).isPresent()) {
-            return new IncubatorApiLoader(moduleName, new BooleanSupplier() {
-                private boolean isLoaded;
-                @Override
-                public boolean getAsBoolean() {
-                    if (isLoaded)
-                        return true;
-                    try {
-                        Class.forName(classNameInModule, false, null);
-                    } catch (ClassNotFoundException e) {
-                        return false;
-                    }
-                    isLoaded = true;
-                    return true;
+            return new IncubatorApiLoader(moduleName, () -> {
+                try {
+                    Class.forName(classNameInModule, false, null);
+                } catch (ClassNotFoundException e) {
+                    return false;
                 }
+                return true;
             });
         }
         return NOT_SUPPORTED_LOADER;
@@ -52,6 +48,8 @@ public final class IncubatorApiLoader {
 
     @SuppressWarnings("Since15")
     public static IncubatorApiLoader of(String moduleName, BooleanSupplier isLoadedSupplier) {
+        Objects.requireNonNull(moduleName);
+        Objects.requireNonNull(isLoadedSupplier);
         if (!IS_MODULE_SUPPORTED)
             return NOT_SUPPORTED_LOADER;
         if (ModuleFinder.ofSystem().find(moduleName).isPresent()) {
@@ -126,7 +124,7 @@ public final class IncubatorApiLoader {
         return true;
     }
 
-    private static final boolean IS_MODULE_SUPPORTED;
+    public static final boolean IS_MODULE_SUPPORTED;
 
     static {
         boolean isModuleSupported;
